@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Mon Mar 25 15:17:23 2019
@@ -6,7 +6,7 @@ Created on Mon Mar 25 15:17:23 2019
 @author: andres
 """
 
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Tue Mar 19 15:24:04 2019
@@ -14,7 +14,7 @@ Created on Tue Mar 19 15:24:04 2019
 @author: andres
 """
 
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jan  4 17:24:06 2019
@@ -32,7 +32,7 @@ from cpt_convert import loadCPT # Import the CPT convert function
 import shutil
 import os
 
-mes='201801'#---------------------------------------------------->>>> cambia dia a dia
+mes = '201801'  # ---------------------------------------------------->>>> cambia dia a dia
 
 folder = '/home/alighezzolo/BTCH13/OUTPUTS/NC/'+mes+'/'
 
@@ -40,8 +40,8 @@ folder = '/home/alighezzolo/BTCH13/OUTPUTS/NC/'+mes+'/'
 imagenes_plots = [f for f in listdir(folder) if isfile(join(folder, f)) and f.endswith('.nc')]
 imagenes_plots.sort()
 
-longitud=len(imagenes_plots)
-print('número de imagenes =',longitud)
+longitud = len(imagenes_plots)
+print('número de imagenes =', longitud)
 
 ##################################copiado de .nc template
 
@@ -66,25 +66,25 @@ for i in range(0,longitud):
     #print(Maux_0[4200,3800])
     #print(Maux_0[4200,3800].sum())
     
-#fig = plt.figure()
-#imagen_REF = plt.imshow(Valores_TB_0, origin='upper', vmin=0, vmax=3, cmap='jet')
-#plt.title('Numero de eventos')
-#plt.ylabel('coordenadas Y')
-#plt.xlabel('coordenadas X')
-#cb = fig.colorbar(imagen_REF, orientation='vertical')
-#cb.set_ticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 ,0.7, 0.8, 0.9, 1])
-#cb.set_label('Eventos diarios por pixel')
+# fig = plt.figure()
+# imagen_REF = plt.imshow(Valores_TB_0, origin='upper', vmin=0, vmax=3, cmap='jet')
+# plt.title('Numero de eventos')
+# plt.ylabel('coordenadas Y')
+# plt.xlabel('coordenadas X')
+# cb = fig.colorbar(imagen_REF, orientation='vertical')
+# cb.set_ticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 ,0.7, 0.8, 0.9, 1])
+# cb.set_label('Eventos diarios por pixel')
 
-#plt.savefig(folder+'Frecuencia_'+mes+'_FD.png',dpi=300)
+# plt.savefig(folder+'Frecuencia_'+mes+'_FD.png',dpi=300)
 
 
     
     
     
     
-filename=folder+'Frecuencia_'+mes+'.nc' ####El archivo a crear no debe tener la variable escrita
+filename = folder+'Frecuencia_'+mes+'.nc' ####El archivo a crear no debe tener la variable escrita
 
 ncfile = Dataset(filename,'r+')
-data=ncfile.createVariable('mes_frec',ncfile.variables['CMI'].dtype.char, ('x','y'))
+data = ncfile.createVariable('mes_frec',ncfile.variables['CMI'].dtype.char, ('x','y'))
 data[:]=Maux_0
 ncfile.close()
