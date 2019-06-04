@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-@author: Sergio
-@
 
-Basado en test6a 
-Levanta todos los parametros con NETCDF y escribe algunos en un archivo de metadato
+Levanta todos los parametros con NETCDF y escribe algunos en un archivo
+de metadato
 Se reagrupan segun de que se tratan
 Se presentan primero los valores numericos (o string), luego con # el nombre de
- la variable original y eventualmente una explicacion  
-
+ la variable original y eventualmente una explicacion
 
 http://geoinformaticstutorial.blogspot.com.ar/2012/09/reading-raster-data-with-python-and-gdal.html
 
-Groseramente modificado por AL para procesar estadisticas de GOES-16 
+Groseramente modificado por AL para procesar estadisticas de GOES-16
 """
 # Required libraries
 from netCDF4 import Dataset
@@ -51,24 +48,24 @@ dire = '/home/alighezzolo/BTCH13/DATA/'+dia+'/'  # prueba andres
 
 def ploteador(archi):
     path = dire+archi
-    
+
     # %% Lee NETCDF
     g16nc = Dataset(path, 'r')
-    
+
     # Explora las variables
     dataset = Dataset(dire+archi)
-    print(dataset.file_format)    
+    print(dataset.file_format)
     variables = dataset.variables.keys()  # lista las variables
-    
+
     for v in variables:
         print("%s %s" % (v, dataset.variables[v]))
-    
+
     band_id = dataset.variables['band_id'][:]
     band_wavelength = dataset.variables['band_wavelength'][:]
-    
+
     # %% Escribe en un archivo todos los datos
     archi2 = archi[:-2]+'txt'
-    
+
     # Informacion general
     f = open(dire+archi2, 'w')
     f.write("%s #%s\n" % (dataset.file_format, 'Formato del archivo original'))
@@ -94,14 +91,14 @@ def ploteador(archi):
                           "Resolucion en y"))
     f.write("%s #%s\n" % (dataset.variables['y'].units,
                           "Unidades en y"))
-    
+
     f.write("%f #%s\n" % (dataset.variables['t'][0], "Tiempo"))
     f.write("%s #%s\n" % (dataset.variables['t'].units, "Unidades de tiempo"))
-    
+
     # Parametros geometricos  y de proyeccion
     f.write("%s #%s\n" % (dataset.variables['goes_imager_projection'].
                           grid_mapping_name, " Tipo de proyeccion "))
-    
+
     f.write("%s #%s\n" % (dataset.variables['geospatial_lat_lon_extent'].
                           getncattr('geospatial_westbound_longitude'),
                           "Limite Oeste"))
@@ -120,7 +117,7 @@ def ploteador(archi):
     f.write("%s #%s\n" % (dataset.variables['geospatial_lat_lon_extent'].
                           getncattr('geospatial_lon_center'),
                           "Longitud central"))
-          
+
     f.write("%f #%s\n" % (dataset.variables['goes_imager_projection'].
                           getncattr('perspective_point_height'), "Altura"))
     f.write("%s #%s\n" % (dataset.variables['goes_imager_projection'].
@@ -128,9 +125,9 @@ def ploteador(archi):
     f.write("%s #%s\n" % (dataset.variables['goes_imager_projection'].
                           getncattr('semi_minor_axis'), "Semi eje menor"))
     f.write("%s #%s\n" % (dataset.variables['goes_imager_projection'].
-                          getncattr('inverse_flattening'), 
+                          getncattr('inverse_flattening'),
                           "Achatamiento inverso"))
-     
+
     # Parametros de calibracion
     f.write("%f #%s\n" % (dataset.variables['CMI'].
                           add_offset, "Offset"))
@@ -172,6 +169,3 @@ for file in files:
         continue
     print('*'*200 + file)
     ploteador(file)
-
-g16nc.close()
-f.close()

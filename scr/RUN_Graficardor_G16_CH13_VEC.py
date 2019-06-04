@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jun 1 11:59:10 2018
-
-@author: Sergio
-
-Basado en test5d.py
-
 Lee los datos a partir de el archivo de metadatos generados previamente con
     GenMetadato_Goes16_v1.py
 
@@ -39,7 +33,7 @@ import os
 
 def fecha(t0):
     """
-    Dado un t0 en segundos, devuelve un par de strings de 
+    Dado un t0 en segundos, devuelve un par de strings de
     fecha para las figuras (fechaT) y nombres de los archivos (fechaN)
 
     Parametro
@@ -49,13 +43,13 @@ def fecha(t0):
     """
 
     mes = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep',
-           'Oct', 'Nov', 'Dic']   
+           'Oct', 'Nov', 'Dic']
     fechaT = ('%i-%s-%02d %02d:%02d:%02d UTC' % (t.gmtime(t0)[0],
                                                  mes[t.gmtime(t0)[1]],
                                                  t.gmtime(t0)[1],
                                                  t.gmtime(t0)[3],
                                                  t.gmtime(t0)[4],
-                                                 t.gmtime(t0)[5]))            
+                                                 t.gmtime(t0)[5]))
     fechaN = ('%i%02d%02d_%02d%02d%02d' % (t.gmtime(t0)[0], t.gmtime(t0)[1],
                                            t.gmtime(t0)[1], t.gmtime(t0)[3],
                                            t.gmtime(t0)[4], t.gmtime(t0)[5]))
@@ -90,7 +84,7 @@ elif Region == 'SuA':
 else:
     print("Error de definicion en la region, debe ser ARG o SuA")
     sys.exit(0)
-    
+
 resolution = 1.
 
 # nombrevo a procesar
@@ -130,22 +124,22 @@ direcpt = '/home/alighezzolo/BTCH13/CPT/'
 # nombre='OR_ABI-L2-CMIPF-M3C01_G16_s20181781415384_e20181781426151_c20181781426227'
 
 
-def ploteador(nombre):  
+def ploteador(nombre):
     # archi=dire+nombre+'.nc'
     # archiM=dire+nombre+'.txt'
     archi = dataPATH + nombre  # archi=dire+nombre+'.nc'
     archiM = dataPATH + nombre[0:73] + '.txt'
-    
+
     if (nombre[8] == '1'):
         VAR = nombre[11:14]
     elif(archi[8] == '2'):
         VAR = nombre[10:13]
     VAR = 'CMI'
-    
+
     start = t.time()
-        
+
     # %% Lectura de Metadatos
-    
+
     arch = open(archiM, 'r')
     lines = arch.readlines()
     icanal = int(lines[3].split('#')[0])
@@ -153,20 +147,20 @@ def ploteador(nombre):
     rows = int(lines[6].split('#')[0])
     t_0 = float(lines[12].split('#')[0])
     t_start = lines[13][14:33]  # Fecha correspondiente a 0s
-    
+
     # Parametross de calibracion
     offset = float(lines[25].split('#')[0])  # DN->L
     scale = float(lines[26].split('#')[0])
-    
+
     esun = float(lines[28].split('#')[0])
     kapa0 = float(lines[30].split('#')[0])  # L->reflectancia
     ukapa0 = lines[31].split('#')[0]  # unidades
-                
+
     fk1 = float(lines[34].split('#')[0])  # DN->K
     fk2 = float(lines[36].split('#')[0])
     bc1 = float(lines[38].split('#')[0])
-    bc2 = float(lines[40].split('#')[0])            
-    
+    bc2 = float(lines[40].split('#')[0])
+
     # Parametros de proyeccion
     proj = lines[14].split('#')[0]
     lat_0 = lines[19].split('#')[0]
@@ -175,176 +169,176 @@ def ploteador(nombre):
     a = lines[22].split('#')[0]
     b = lines[23].split('#')[0]
     f = 1 / float(lines[24].split('#')[0])
-    
+
     arch.close
-              
+
     # %%Configuraciones espec'ificas para cada banda
-    
+
     canal = ('%02d' % icanal)
     if icanal > 11:
         cptfile = 'IR4AVHRR6.cpt'
     elif icanal > 7:
         cptfile = 'SVGAWVX_TEMP.cpt'
-    else:    
+    else:
         cptfile = 'SVGAIR2_TEMP.cpt'
-    
+
     print(cptfile)
-    
+
     # %% lectura y extraccion de informacion de la pasada
     connectionInfo = 'HDF5:\"' + archi + '\"://'+VAR
-        
+
     raw = gdal.Open(connectionInfo, gdal.GA_ReadOnly)
-    
+
     driver = raw.GetDriver().LongName
-    
+
     band = raw.GetRasterBand(1)
     bandtype = gdal.GetDataTypeName(band.DataType)
     print(bandtype)
     # data = band.ReadAsArray(0, 0, cols, rows)
     data = band.ReadAsArray()
-    
+
     #  %% Proyecciones
-    
+
     # GOES-16 Spatial Reference System
     sourcePrj = osr.SpatialReference()
     # sourcePrj.ImportFromProj4('+proj='+proj+' +h='+h+' +a='+a+' +b='+b+' +
     # f='+str(f)#no es valida proj+'geostationary'
-    #             +'lat_0='+lat_0+' +lon_0='+lon_0+' +sweep=x +no_defs')  
-    
+    #             +'lat_0='+lat_0+' +lon_0='+lon_0+' +sweep=x +no_defs')
+
     sourcePrj.ImportFromProj4('+proj=geos +h=' + h + ' +a=' + a + ' +b=' +
                               b + '  +f=' + str(f) + 'lat_0=' + lat_0 +
                               ' +lon_0=' + lon_0 + ' +sweep=x +no_defs')
-    
+
     # Lat/lon WSG84 Spatial Reference System
     targetPrj = osr.SpatialReference()
     targetPrj.ImportFromProj4('+proj=longlat +ellps=WGS84 \
                                +datum=WGS84 + no_defs')
-    
+
     # Setup projection and geo-transformation
     raw.SetProjection(sourcePrj.ExportToWkt())
-    raw.SetGeoTransform(getGeoT(GOES16_EXTENT, raw.RasterYSize, 
+    raw.SetGeoTransform(getGeoT(GOES16_EXTENT, raw.RasterYSize,
                         raw.RasterXSize))
-            
+
     # Compute grid dimension
     sizex = int(((extent[2] - extent[0]) * KM_PER_DEGREE) / resolution)
     sizey = int(((extent[3] - extent[1]) * KM_PER_DEGREE) / resolution)
-        
+
     # Get memory driver
     memDriver = gdal.GetDriverByName('MEM')
-       
+
     # Create grid
     grid = memDriver.Create('grid', sizex, sizey, 1, gdal.GDT_Float32)
-        
+
     # Setup projection and geo-transformation
     grid.SetProjection(targetPrj.ExportToWkt())
     grid.SetGeoTransform(getGeoT(extent, grid.RasterYSize, grid.RasterXSize))
-    
-    # Perform the projection/resampling 
+
+    # Perform the projection/resampling
     gdal.ReprojectImage(raw, grid, sourcePrj.ExportToWkt(),
                         targetPrj.ExportToWkt(),
                         gdal.GRA_NearestNeighbour,
                         options=['NUM_THREADS=ALL_CPUS'])
-              
+
     # Read grid data
     array1 = grid.ReadAsArray()
-      
+
     # Mask fill values (i.e. invalid values)
     np.ma.masked_where(array1, array1 == -1, False)
-        
+
     # %% Calibracion
     array = array1 * scale + offset  # DN ->mW m-2 sr-1 mum-1
     # if icanal>=7:#DN ->C
-    #    Temp=(fk2 / (np.log((fk1 / array) + 1)) - bc1 ) / 
+    #    Temp=(fk2 / (np.log((fk1 / array) + 1)) - bc1 ) /
     #    bc2-273.15#mW m-2 sr-1 mum-1 ->C
     # else:
     #    Temp=kapa0*array#REVISAR!!!
     Temp = array - 273.15
     # Temp=array
-        
+
     grid.GetRasterBand(1).SetNoDataValue(-1)
     grid.GetRasterBand(1).WriteArray(array)
-    
+
     # %% Plot the Data ========================================================
     # Create the basemap reference for the Rectangular Projection
-    
-    t_ini = t_0 + float(calendar.timegm(t.strptime(t_start, 
+
+    t_ini = t_0 + float(calendar.timegm(t.strptime(t_start,
                         '%Y-%m-%d %H:%M:%S')))
     fechaT, fechaN = fecha(t_ini)  # Fechas para titulos y nombre de archivo
-    
+
     fig = plt.figure(num=1, clear='True')
     # frameon es para NO desplegar la figura
     fig = plt.figure(num=1, figsize=[20, 16], dpi=300, frameon='False')
     # 4326 es WGS84 (LatLOn)
     bmap = Basemap(resolution='h', llcrnrlon=extent[0], llcrnrlat=extent[1],
                    urcrnrlon=extent[2], urcrnrlat=extent[3], epsg=4326)
-     
+
     # Draw the shapefiles
-    bmap.readshapefile(dires+'008_limites_provinciales_LL', 
+    bmap.readshapefile(dires+'008_limites_provinciales_LL',
                        '008_limites_provinciales_LL', linewidth=0.3, color='w')
     bmap.readshapefile(dires+'DEPARTAMENTOS_linea', 'DEPARTAMENTOS_linea',
                        linewidth=0.1, color='gray')
     # bmap.readshapefile(dires3+'Límites_internacionales','Límites_internacionales',linewidth=0.3,color='w')
     # bmap.readshapefile(dires+'Ejidos_urbanos_linea','Ejidos_urbanos_linea',linewidth=0.1,color='yellow')#bmap.readshapefile(dires3+'Límites_internacionales','Límites_internacionales',linewidth=0.3,color='w')
     # bmap.readshapefile(dires+'Lago_San_Roque','Lago_San_Roque',linewidth=0.5,color='blue')#bmap.readshapefile(dires3+'Límites_internacionales','Límites_internacionales',linewidth=0.3,color='w')
-    # bmap.readshapefile(dires+'Ejidos_afectados_linea','Ejidos_afectados_linea',linewidth=0.7,color='w')#bmap.readshapefile(dires3+'Límites_internacionales','Límites_internacionales',linewidth=0.3,color='w')       
-    # bmap.readshapefile(dires+'Zona_Afectada_EPSG4326_linea','Zona_Afectada_EPSG4326_linea',linewidth=0.7,color='w')#bmap.readshapefile(dires3+'Límites_internacionales','Límites_internacionales',linewidth=0.3,color='w')       
+    # bmap.readshapefile(dires+'Ejidos_afectados_linea','Ejidos_afectados_linea',linewidth=0.7,color='w')#bmap.readshapefile(dires3+'Límites_internacionales','Límites_internacionales',linewidth=0.3,color='w')
+    # bmap.readshapefile(dires+'Zona_Afectada_EPSG4326_linea','Zona_Afectada_EPSG4326_linea',linewidth=0.7,color='w')#bmap.readshapefile(dires3+'Límites_internacionales','Límites_internacionales',linewidth=0.3,color='w')
     # bmap.readshapefile(dires+'ne_10m_admin_0_map_units/ne_10m_admin_0_map_units','ne_10m_admin_0_map_units',linewidth=0.3,color='w')
     # bmap.readshapefile(dires+'limite_interprovincial/Límites_interprovinciales','Límites_interprovinciales',linewidth=0.3,color='w')
     # bmap.readshapefile(dires3+'Límites_internacionales','Límites_internacionales',linewidth=0.3,color='w')
-     
+
     # Draw parallels and meridians
-    bmap.drawparallels(np.arange(-90.0, 90.0, 3.), linewidth=0.3, 
-                       dashes=[4, 4], color='white', labels=[True, 
-                       True, False, False], fmt='%g', labelstyle="+/-", 
+    bmap.drawparallels(np.arange(-90.0, 90.0, 3.), linewidth=0.3,
+                       dashes=[4, 4], color='white', labels=[True,
+                       True, False, False], fmt='%g', labelstyle="+/-",
                        xoffset=0.10, yoffset=-1.00, size=5)
-    bmap.drawmeridians(np.arange(0.0, 360.0, 3.), linewidth=0.3, 
+    bmap.drawmeridians(np.arange(0.0, 360.0, 3.), linewidth=0.3,
                        dashes=[4, 4], color='white', labels=[False,
-                       False, True, False], fmt='%g', labelstyle="+/-", 
+                       False, True, False], fmt='%g', labelstyle="+/-",
                        xoffset=-0.80, yoffset=0.20, size=5)
-     
+
     # Converts a CPT file to be used in Python
     # cptfile = "crisp_ice.cpt"
     cpt = loadCPT(direcpt+cptfile)
-    
+
     # Makes a linear interpolation
     cpt_convert = LinearSegmentedColormap('cpt', cpt)
-     
-    # Plot the GOES-16 channel with the converted CPT colors (you may alter 
+
+    # Plot the GOES-16 channel with the converted CPT colors (you may alter
     # the min and max to match your preference)
     if icanal >= 7:
-        img_plot = bmap.imshow(Temp, origin='upper', cmap=cpt_convert, 
+        img_plot = bmap.imshow(Temp, origin='upper', cmap=cpt_convert,
                                vmin=-90, vmax=50)
     else:
-        img_plot = bmap.imshow(Temp, origin='upper', cmap='Greys', 
+        img_plot = bmap.imshow(Temp, origin='upper', cmap='Greys',
                                vmin=0.001, vmax=0.1)  # 'Greys'
-    
+
     # Add a black rectangle in the bottom to insert the image description
     lon_difference = (extent[2] - extent[0])  # Max Lon - Min Lon
     currentAxis = plt.gca()
-    currentAxis.add_patch(Rectangle((extent[0], extent[1]), lon_difference, 
-                          (lon_difference) * 0.040, alpha=1, zorder=3, 
+    currentAxis.add_patch(Rectangle((extent[0], extent[1]), lon_difference,
+                          (lon_difference) * 0.040, alpha=1, zorder=3,
                           facecolor='black'))
-    
+
     if icanal >= 7:
         Unit = "Temperatura de Brillo [°C]"
     else:
         Unit = "Reflectancia"
-    
-    t_ini = raw.GetMetadata()['date_created']    
+
+    t_ini = raw.GetMetadata()['date_created']
     date = str(t_ini[0:10])
     time = str(nombre[34:36]) + ":" + str(nombre[36:38])
     Title = " GOES-16 ABI Canal " + canal + " " + date + " " + time + " UTC"
-    
+
     # Title = " GOES-16 ABI Canal "+ canal +" "+ fechaT
     Institution = "CONAE-Argentina"
-    
+
     # Add the image description inside the black rectangle
     lat_difference = (extent[3] - extent[1])  # Max lat - Min lat
-    plt.text(extent[0], extent[1] + lat_difference * 0.005, Title, 
+    plt.text(extent[0], extent[1] + lat_difference * 0.005, Title,
              horizontalalignment='left', color='white', size=5)
-    plt.text(extent[2], extent[1] + lat_difference * 0.005, Institution, 
+    plt.text(extent[2], extent[1] + lat_difference * 0.005, Institution,
              horizontalalignment='right', color='white', size=5)
-    
+
     # Insert the colorbar at the right
     cb = bmap.colorbar(location='bottom', size='2%', pad='1%')
     cb.outline.set_visible(True)  # Remove the colorbar outline
@@ -353,28 +347,28 @@ def ploteador(nombre):
     # the colorbar
     cb.ax.tick_params(axis='x', colors='black', labelsize=6)  # Change the
     # color and size of the colorbar labels
-    
+
     cb.set_label(Unit)
-     
+
     # Export the result to GeoTIFF
     # driver = gdal.GetDriverByName('GTiff')
     # driver.CreateCopy(dire+'Channel_'+ canal+'_'+
     # Region+fechaN+'_WGS84.tif', grid, 0)
-    
+
     # grabar a png
 
     # Volver este
     # plt.savefig(dire_out+'Channel_'+ canal+'_'+Region+'_'+
-    # date+'_'+time+'_WGS84.png', 
+    # date+'_'+time+'_WGS84.png',
     # dpi=300,bbox_inches='tight', pad_inches=0)
     # dire_out2='/media/andres/Elements/GOES16/BTCH13/ANTARTIDA/'
     plt.savefig(dire_out+'Channel_' + canal+'_' + Region + '_' + date +
                 '_' + time + '_WGS84.png', dpi=300, bbox_inches='tight',
                 pad_inches=0)
-    
+
     # plt.savefig(dire+'Channel_'+ canal+'_'+Region+'_'+date+'_'+time+
     # '_WGS84.png', dpi=500,figsize=[20,16])
-    
+
     # Close file
     raw = None
     print('- finished! Time:', t.time() - start, 'seconds')
@@ -392,4 +386,3 @@ for file in files:
         continue
     print('*'*200 + file)
     ploteador(file)
-    
