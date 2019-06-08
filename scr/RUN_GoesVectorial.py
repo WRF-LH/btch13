@@ -12,10 +12,10 @@ from rasterstats import zonal_stats
 
 fechaDOY = sys.argv[1]+sys.argv[2]
 
-gdf = gpd.read_file('/home/andres/GOES16/SHAPES/departamentos.shp',
+gdf = gpd.read_file('/home/sagus/Development/btch13/shapes/departamentos.shp',
                     encoding='utf-8')
 
-dire = '/home/andres/GOES16/DATATMP/'
+dire = '/home/sagus/Development/btch13/datamap/'
 
 
 def proccess(raster_name):
@@ -60,7 +60,7 @@ def proccess(raster_name):
     f.text(0.55, 0.12, str(titulo), size=15, ha='center', va='center',
            rotation=0)
 
-    provincias = gpd.read_file('/home/andres/GOES16/SHAPES/\
+    provincias = gpd.read_file('/home/sagus/Development/btch13/shapes/\
                                 008_limites_provinciales.shp')
 
     provincias.plot(ax=ax, edgecolor='#000000', linewidth=0.2, color='None')
@@ -69,7 +69,7 @@ def proccess(raster_name):
     Region = 'ARG'
     date = raster_name[15:31]
 
-    plt.savefig('/home/andres/GOES16/OUTPUTS/'+fechaDOY+'/Channel_'
+    plt.savefig('/home/sagus/Development/btch13/salidas/'+fechaDOY+'/Channel_'
                 + canal + '_' + Region+'_'+date+'_WGS84_DEPTO.png',
                 dpi=150, bbox_inches='tight')
 

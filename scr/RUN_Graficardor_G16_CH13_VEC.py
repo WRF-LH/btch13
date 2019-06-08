@@ -91,17 +91,15 @@ resolution = 1.
 # dire='/mnt/E01498161497EE32/Users/Sergio/Conae/GRI/GOES_R/SMN/'
 # dire='/mnt/E01498161497EE32/Users/Sergio/Conae/GRI/GOES_R/CUSS/'
 # fechaDOY='2018002'#------------------------>>>> cambia dia a dia
-fechaDOY = sys.argv[1] + sys.argv[2]
+#fechaDOY = sys.argv[1] + sys.argv[2]
 
-dire_out = '/home/alighezzolo/BTCH13/OUTPUTS/PNG/' + fechaDOY
-+ '/' + os.makedirs(dire_out)
-
+dire_out = '/home/sagus/Development/btch13/salidas/PNG/'
 # dire='/media/andres/Elements/GOES16/BTCH13/IMAGENES/'+fechaDOY+'/'
-dataPATH = '/home/alighezzolo/BTCH13/DATA/'+fechaDOY+'/'  # prueba andres
+dataPATH = '/mnt/datos/goes_16/datos/casos/2019-03-30-31_RRQPOE/'  # prueba andres
 
 # dire='/media/andres/Elements/GOES16/descargas/20180630_granizo_goya_y_otros/CH13/'
-dires = '/home/alighezzolo/BTCH13/SHAPES/'
-direcpt = '/home/alighezzolo/BTCH13/CPT/'
+dires = '/home/sagus/Development/btch13/shapes/'
+direcpt = '/home/sagus/Development/btch13/cpt/'
 # dire_out='/media/andres/Elements/GOES16/BTCH13/OUTPUTS/'+dia+'/nc/png/'
 
 # nombre='OR_ABI-L1b-RadF-M3C01_G16_s20180961500406_e20180961511173_c20180961511217'
@@ -142,33 +140,34 @@ def ploteador(nombre):
 
     arch = open(archiM, 'r')
     lines = arch.readlines()
-    icanal = int(lines[3].split('#')[0])
-    cols = int(lines[5].split('#')[0])
-    rows = int(lines[6].split('#')[0])
-    t_0 = float(lines[12].split('#')[0])
-    t_start = lines[13][14:33]  # Fecha correspondiente a 0s
+    #icanal = int(lines[3].split('#')[0])
+    icanal = 10
+    cols = int(lines[4].split('#')[0])
+    rows = int(lines[5].split('#')[0])
+    t_0 = float(lines[10].split('#')[0])
+    t_start = lines[11][14:33]  # Fecha correspondiente a 0s
 
     # Parametross de calibracion
-    offset = float(lines[25].split('#')[0])  # DN->L
-    scale = float(lines[26].split('#')[0])
+    offset = 0 # float(lines[25].split('#')[0])  # DN->L
+    scale = 1 # float(lines[26].split('#')[0])
 
-    esun = float(lines[28].split('#')[0])
-    kapa0 = float(lines[30].split('#')[0])  # L->reflectancia
-    ukapa0 = lines[31].split('#')[0]  # unidades
+    #esun = float(lines[28].split('#')[0])
+    #kapa0 = float(lines[30].split('#')[0])  # L->reflectancia
+    #ukapa0 = lines[31].split('#')[0]  # unidades
 
-    fk1 = float(lines[34].split('#')[0])  # DN->K
-    fk2 = float(lines[36].split('#')[0])
-    bc1 = float(lines[38].split('#')[0])
-    bc2 = float(lines[40].split('#')[0])
+    #fk1 = float(lines[34].split('#')[0])  # DN->K
+    #fk2 = float(lines[36].split('#')[0])
+    #bc1 = float(lines[38].split('#')[0])
+    #bc2 = float(lines[40].split('#')[0])
 
     # Parametros de proyeccion
-    proj = lines[14].split('#')[0]
-    lat_0 = lines[19].split('#')[0]
-    lon_0 = lines[20].split('#')[0]
-    h = lines[21].split('#')[0]
-    a = lines[22].split('#')[0]
-    b = lines[23].split('#')[0]
-    f = 1 / float(lines[24].split('#')[0])
+    #proj = lines[14].split('#')[0]
+    lat_0 = lines[13].split('#')[0]
+    lon_0 = lines[14].split('#')[0]
+    h = lines[15].split('#')[0]
+    a = lines[16].split('#')[0]
+    b = lines[17].split('#')[0]
+    f = 1 / float(lines[18].split('#')[0])
 
     arch.close
 
@@ -373,10 +372,10 @@ def ploteador(nombre):
     raw = None
     print('- finished! Time:', t.time() - start, 'seconds')
     # ##############################################################GEOTIFF
-    # grid.GetRasterBand(1).WriteArray(array)
-    # driver = gdal.GetDriverByName('GTiff')
-    # driver.CreateCopy(dire_out+'Channel_'+ canal+'_'+Region+'_'+date+'_'+
-    # time+'_WGS84.tif', grid, 0)
+    grid.GetRasterBand(1).WriteArray(array)
+    driver = gdal.GetDriverByName('GTiff')
+    driver.CreateCopy(dire_out+'Channel_'+ canal+'_'+Region+'_'+date+'_'+
+                      time + '_WGS84.tif', grid, 0)
 
 
 # ####carga de imagenes

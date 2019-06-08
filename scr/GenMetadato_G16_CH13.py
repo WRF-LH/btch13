@@ -17,40 +17,21 @@ from netCDF4 import Dataset
 import os
 import sys
 
-# Parametros basicos
-# dire='/mnt/E01498161497EE32/Users/Sergio/Conae/GRI/GOES_R/CUSS/'
-# dia='2018002'#------------------------------------------>> cambia dia a dia
-dia = sys.argv[1]+sys.argv[2]
 
-dire = '/home/alighezzolo/BTCH13/DATA/'+dia+'/'  # prueba andres
+#dia = sys.argv[1]+sys.argv[2]
 
 
-# archi='OR_ABI-L1b-RadF-M3C01_G16_s20180961500406_e20180961511173_c20180961511217.nc'
-# archi='OR_ABI-L1b-RadF-M3C02_G16_s20180961500406_e20180961511173_c20180961511211.nc'
-# archi='OR_ABI-L1b-RadF-M3C03_G16_s20180961500406_e20180961511173_c20180961511220.nc'
-# archi='OR_ABI-L1b-RadF-M3C04_G16_s20180961500406_e20180961511173_c20180961511197.nc'
-# archi='OR_ABI-L1b-RadF-M3C05_G16_s20180961500406_e20180961511173_c20180961511218.nc'
-# archi='OR_ABI-L1b-RadF-M3C06_G16_s20180961500406_e20180961511178_c20180961511215.nc'
-# archi='OR_ABI-L1b-RadF-M3C07_G16_s20180961500406_e20180961511184_c20180961511220.nc'
-# archi='OR_ABI-L1b-RadF-M3C08_G16_s20180961500406_e20180961511173_c20180961511220.nc'
-# archi='OR_ABI-L1b-RadF-M3C09_G16_s20180961500406_e20180961511178_c20180961511238.nc'
-# archi='OR_ABI-L1b-RadF-M3C10_G16_s20180961500406_e20180961511184_c20180961511233.nc'
-# archi='OR_ABI-L1b-RadF-M3C11_G16_s20180961500406_e20180961511173_c20180961511232.nc'
-# archi='OR_ABI-L1b-RadF-M3C12_G16_s20180961500406_e20180961511178_c20180961511229.nc'
-# archi='OR_ABI-L1b-RadF-M3C13_G16_s20180961500406_e20180961511184_c20180961511236.nc'
-# archi='OR_ABI-L1b-RadF-M3C14_G16_s20180951215403_e20180951226170_c20180951226236.nc'
-# archi='OR_ABI-L1b-RadF-M3C14_G16_s20180961500406_e20180961511173_c20180961511238.nc'
-# archi='OR_ABI-L1b-RadF-M3C15_G16_s20180961500406_e20180961511178_c20180961511237.nc'
-# archi='OR_ABI-L1b-RadF-M3C16_G16_s20180961500406_e20180961511184_c20180961511235.nc'
+SHAPEFILES = os.environ['GOES_DATA'] + '/shapefiles'
+logo = os.environ['GOES_DATA'] + '/img/wug_txt2.png'
+#DATA = os.environ[]
+dire = '/mnt/datos/goes_16/datos/casos/2019-03-30-31_RRQPOE/'  # prueba andres
 
-# archi='OR_ABI-L1b-RadF-M3C13_G16_s20181661315417_e20181661326195_c20181661326252.nc'
-# archi='OR_ABI-L2-CMIPF-M3C01_G16_s20181781415384_e20181781426151_c20181781426227.nc'
 
 def ploteador(archi):
     path = dire+archi
 
     # %% Lee NETCDF
-    g16nc = Dataset(path, 'r')
+    #g16nc = Dataset(path, 'r')
 
     # Explora las variables
     dataset = Dataset(dire+archi)
@@ -60,13 +41,13 @@ def ploteador(archi):
     for v in variables:
         print("%s %s" % (v, dataset.variables[v]))
 
-    band_id = dataset.variables['band_id'][:]
-    band_wavelength = dataset.variables['band_wavelength'][:]
+    # band_id = dataset.variables['band_id'][:]
+    # band_wavelength = dataset.variables['band_wavelength'][:]
 
     # %% Escribe en un archivo todos los datos
     archi2 = archi[:-2]+'txt'
 
-    # Informacion general
+   # Informacion general
     f = open(dire+archi2, 'w')
     f.write("%s #%s\n" % (dataset.file_format, 'Formato del archivo original'))
     f.write("%s #%s\n" % (dataset.variables['CMI'].long_name,
