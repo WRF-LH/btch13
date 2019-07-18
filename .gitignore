@@ -1,3 +1,7 @@
 .vscode/
 salidas/
 datos/
+*.ipynb
+notebooks/
+Cartopy/
+datamap/
